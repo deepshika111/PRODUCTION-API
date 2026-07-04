@@ -7,6 +7,7 @@ class Settings (BaseSettings):
 
     # LLM Configuration
     openai_api_key: str
+    openai_base_url: str = "https://api.groq.com/openai/v1"
     primary_model: str = "gpt-4o-mini"
     fallback_model: str = "gpt-4o-mini"
 

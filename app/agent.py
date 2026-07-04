@@ -36,7 +36,8 @@ class ProductionAgent:
             temperature=0,
             timeout=30,
             max_retries=0,
-            api_key=settings.openai_api_key
+            api_key=settings.openai_api_key,
+            base_url=settings.openai_base_url
         )
 
         self.fallback_llm = ChatOpenAI(
@@ -44,7 +45,8 @@ class ProductionAgent:
             temperature=0,
             timeout=30,
             max_retries=0,
-            api_key=settings.openai_api_key
+            api_key=settings.openai_api_key,
+            base_url=settings.openai_base_url
         )
 
         self.max_retries = settings.max_retries

@@ -28,19 +28,30 @@ class JSONFormatter (logging.Formatter):
 
 
 
-    def get_logger (name:str = 'production-api') :
+def get_logger (name:str = 'production-api') :
 
-        """ Creating a JSON Logger """
+    """ Creating a JSON Logger """
 
-        logger = logging.getLogger (name)
+    logger = logging.getLogger (name)
 
-        if not logger.handlers:
-            handler = logging.StreamHandler()
-            handler.setFormatter (JSONFormatter())
-            logger.addHandler (handler)
-            logger.setLevel (logging.INFO)
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter (JSONFormatter())
+        logger.addHandler (handler)
+        logger.setLevel (logging.INFO)
 
-        return logger
+    return logger
+
+class RequestTimer:
+    """Context manager that measures elapsed time in milliseconds."""
+
+    def __enter__(self):
+        self.start = time.perf_counter()
+        self.elapsed_ms = 0.0
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.elapsed_ms = (time.perf_counter() - self.start) * 1000
 
 
 class MetricsCollector:
@@ -108,38 +119,7 @@ class MetricsCollector:
             "cache_hit_rate": f"{cache_hit_rate:.2%}",
         }
 
-if __name__ == "__main__":
-    from app.monitoring import get_logger, MetricsCollector, RequestTimer
-    import time
-    import json
 
-    logger = get_logger()
-    metrics = MetricsCollector()
-
-    print('=== STRUCTURED LOGGING ===')
-    print()
-    logger.info('Application starting')
-    logger.info('Processing request', extra={'extra_data': {'user_id': 'user-123', 'thread_id': 1}})
-    logger.warning('Rate limit approaching', extra={'extra_data': {'current_rate': 18, 'limit': 20}})
-    print()
-
-    # Simulate some requests
-    with RequestTimer() as timer:
-        time.sleep(0.1)  # simulate work
-    metrics.record_request(latency_ms=timer.elapsed_ms, input_tokens=50, output_tokens=100, cache_hit=False)
-    print(f'Request 1: {timer.elapsed_ms:.1f}ms')
-
-    with RequestTimer() as timer:
-        time.sleep(0.05)
-    metrics.record_request(latency_ms=timer.elapsed_ms, input_tokens=30, output_tokens=80, cache_hit=True)
-    print(f'Request 2: {timer.elapsed_ms:.1f}ms (cache hit)')
-
-    metrics.record_request(latency_ms=5.0, input_tokens=0, output_tokens=0, error=True)
-    print('Request 3: error')
-
-    print()
-    print('=== METRICS SUMMARY ===')
-    print(json.dumps(metrics.get_summary(), indent=2))
 
 
 
