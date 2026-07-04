@@ -72,8 +72,8 @@ class MetricsCollector:
     def record_request(
         self,
         latency_ms: float,
-        input_tokens: int,
-        output_tokens: int,
+        input_tokens: int = 0,
+        output_tokens: int = 0,
         error: bool = False,
         cache_hit: bool = False,
     ):
