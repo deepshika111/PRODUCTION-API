@@ -139,7 +139,7 @@ async def chat(request: Request, body: ChatRequest):
         # ---- Step 2: Cache Lookup ----
         cached_response = cache.get(cleaned_message)
         if cached_response is not None:
-            metrics.record_request(latency_ms=0, cache_hit=True)
+            metrics.record_request(latency_ms=0, input_tokens=0, output_tokens=0, cache_hit=True)
             logger.info("Cache hit", extra={"extra_data": {
                 "thread_id": body.thread_id,
             }})
